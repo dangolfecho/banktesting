@@ -1,5 +1,6 @@
 .DS_Store
 local/
+migrations/
 bin/
 include/
 pip-selfcheck.json

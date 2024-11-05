@@ -2,7 +2,6 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-
 from .models import User, BankAccountType, UserBankAccount, UserAddress
 from .constants import GENDER_CHOICE
 
@@ -15,7 +14,7 @@ class UserAddressForm(forms.ModelForm):
             'street_address',
             'city',
             'postal_code',
-            'country'
+            'country',
         ]
 
     def __init__(self, *args, **kwargs):
