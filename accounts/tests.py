@@ -189,40 +189,12 @@ class UserRegistrationFormTests(TestCase):
         self.assertFalse(form.is_valid(), msg=form.errors)
         self.assertIn('birth_date', form.errors)
 
-
-    
-class UserRegistrationFormTests(TestCase):
-    def setUp(self):
-        self.bank_account_type = BankAccountType.objects.create(
-            name="Basic",
-            maximum_withdrawal_amount=1000,
-            annual_interest_rate=5,
-            interest_calculation_per_year=12
-        )
-
-    def test_valid_user_registration_form(self):
-        form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-            'password1': 'SecurePassword123',
-            'password2': 'SecurePassword123',
-            'account_type': self.bank_account_type.pk,
-            'gender': 'M',
-            'birth_date': '1990-01-01'
-        }
-        form = UserRegistrationForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-    # ... [Include all previous tests for UserRegistrationForm here] ...
-
 class AddressFormTests(TestCase):
     def test_valid_address_form(self):
         form_data = {
             'street_address': '123 Main St',
             'city': 'Anytown',
-            'state': 'CA',
-            'zip_code': '90210',
+            'postal_code': '90210',
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
@@ -232,8 +204,7 @@ class AddressFormTests(TestCase):
         form_data = {
             'street_address': '',
             'city': 'Anytown',
-            'state': 'CA',
-            'zip_code': '90210',
+            'postal_code': '90210',
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
@@ -244,63 +215,44 @@ class AddressFormTests(TestCase):
         form_data = {
             'street_address': '123 Main St',
             'city': '',
-            'state': 'CA',
-            'zip_code': '90210',
+            'postal_code': '90210',
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
         self.assertFalse(form.is_valid(), msg=form.errors)
         self.assertIn('city', form.errors)
 
-    def test_state_required(self):
+    def test_postal_code_required(self):
         form_data = {
             'street_address': '123 Main St',
             'city': 'Anytown',
-            'state': '',
-            'zip_code': '90210',
+            'postal_code': '',
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
         self.assertFalse(form.is_valid(), msg=form.errors)
-        print('dfsfds')
-
-        self.assertIn(UserAddressForm(data=form_data), form.errors)
-        print('dfsfds')
-
-    def test_zip_code_required(self):
-        form_data = {
-            'street_address': '123 Main St',
-            'city': 'Anytown',
-            'state': 'CA',
-            'zip_code': '',
-            'country': 'USA'
-        }
-        form = UserAddressForm(data=form_data)
-        self.assertFalse(form.is_valid(), msg=form.errors)
-        self.assertIn('zip_code', form.errors)
+        self.assertIn('postal_code', form.errors)
 
     def test_country_required(self):
         form_data = {
             'street_address': '123 Main St',
             'city': 'Anytown',
-            'state': 'CA',
-            'zip_code': '90210',
+            'postal_code': '90210',
             'country': ''
         }
         form = UserAddressForm(data=form_data)
         self.assertFalse(form.is_valid(), msg=form.errors)
         self.assertIn('country', form.errors)
 
-    def test_zip_code_format(self):
+    def test_postal_code_format(self):
         form_data = {
             'street_address': '123 Main St',
             'city': 'Anytown',
-            'state': 'CA',
-            'zip_code': 'invalid_zip',  # Invalid format
+            'postal_code': 'invalid_zip',  # Invalid format
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
         self.assertFalse(form.is_valid(), msg=form.errors)
-        self.assertIn('zip_code', form.errors)
+        self.assertIn('postal_code', form.errors)
 
     # Additional test cases for address validation can be added here.

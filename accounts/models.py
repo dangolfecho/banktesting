@@ -14,11 +14,13 @@ from .managers import UserManager
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, null=False, blank=False)
+    first_name = models.CharField(max_length=30, null=False, blank=False)  # Add this line
+    last_name = models.CharField(max_length=30, null=False, blank=False)    # Add this line
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['first_name', 'last_name']  # Include first_name and last_name
 
     def __str__(self):
         return self.email
@@ -28,6 +30,7 @@ class User(AbstractUser):
         if hasattr(self, 'account'):
             return self.account.balance
         return 0
+
 
 
 class BankAccountType(models.Model):
