@@ -227,8 +227,8 @@ class UserRegistrationFormTests(TestCase):
             'birth_date': '2090-01-01'  # Date in the future
         }
         form = UserRegistrationForm(data=form_data)
-        self.assertTrue(form.is_valid(), msg=form.errors)
-        #self.assertIn('birth_date', form.errors)
+        self.assertFalse(form.is_valid(), msg=form.errors)
+        self.assertIn('birth_date', form.errors)
 
     def test_password_minimum_length(self):
         form_data = {
@@ -334,8 +334,8 @@ class AddressFormTests(TestCase):
             'country': 'InvalidCountry'
         }
         form = UserAddressForm(data=form_data)
-        self.assertTrue(form.is_valid(), msg=form.errors)
-        #self.assertIn('country', form.errors)
+        self.assertFalse(form.is_valid(), msg=form.errors)
+        self.assertIn('country', form.errors)
 
     def test_city_minimum_length(self):
         form_data = {
@@ -345,8 +345,8 @@ class AddressFormTests(TestCase):
             'country': 'USA'
         }
         form = UserAddressForm(data=form_data)
-        self.assertTrue(form.is_valid(), msg=form.errors)
-        #self.assertIn('city', form.errors)
+        self.assertFalse(form.is_valid(), msg=form.errors)
+        self.assertIn('city', form.errors)
 
     def test_postal_code_numeric_only(self):
         form_data = {
