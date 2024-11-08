@@ -63,6 +63,21 @@ class DepositFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['amount'], [f'You need to deposit at least {self.min_deposit_amount} $'])
 
+    def test_deposit_without_login(self):
+        self.client.logout()
+        response = self.client.post(reverse('transactions:deposit_money'), {'amount': 100, 'transaction_type': DEPOSIT})
+        self.assertRedirects(response, f"{reverse('accounts:user_login')}?next={reverse('transactions:deposit_money')}")
+        
+    def test_deposit_negative_amount(self):
+        response = self.client.post(reverse('transactions:deposit_money'), {
+            'amount': -100, 'transaction_type': DEPOSIT,
+        })
+        self.assertEqual(response.status_code, 200)  # Assume 200 if form re-renders with error
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.balance, Decimal('1000.00'))
+        self.assertContains(response, "Amount must be positive")
+
+
 
 
 class WithdrawFormTest(TestCase):
@@ -92,6 +107,26 @@ class WithdrawFormTest(TestCase):
         form = WithdrawForm(data={'amount': 5}, account=self.account, initial={'transaction_type': WITHDRAWAL})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['amount'], [f'You can withdraw at least {self.min_withdraw_amount} $'])
+
+    def test_withdraw_exceeding_balance(self):
+        response = self.client.post(reverse('transactions:withdraw_money'), {
+            'amount': 1200, 'transaction_type': WITHDRAWAL,
+        })
+        self.assertEqual(response.status_code, 200)  # Assuming form re-renders with error
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.balance, Decimal('1000.00'))
+        self.assertContains(response, "Insufficient funds")
+
+    def test_withdraw_exceeding_max_limit(self):
+        response = self.client.post(reverse('transactions:withdraw_money'), {
+            'amount': 6000, 'transaction_type': WITHDRAWAL,
+        })
+        self.assertEqual(response.status_code, 200)  # Assuming error is displayed on the same page
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.balance, Decimal('1000.00'))
+        self.assertContains(response, "Exceeds maximum withdrawal limit")
+
+
 
 
 
@@ -132,7 +167,6 @@ class TransactionViewsTest(TestCase):
         response = self.client.get(reverse('transactions:transaction_report'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'transactions/transaction_report.html')
-
 
 
 class CalculateInterestTaskTest(TestCase):
